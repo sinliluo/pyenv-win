@@ -1,4 +1,4 @@
-# pyenv for Windows1
+# pyenv for Windows
 
 [pyenv][1] is an amazing tool used to manage multiple versions of python in your machine. We have ported it to Windows. We need your thoughts to improve this library and your feedback helps to grow the project.
 

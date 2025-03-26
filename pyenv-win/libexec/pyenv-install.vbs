@@ -76,8 +76,6 @@ End Sub
 
 Function deepExtract(params, web)
     ' WScript.echo "kkotari: pyenv-install.vbs deepExtract..!"
-    WScript.Echo ":: [Debug] :: dark.exe 目录: " & strDirWiX
-
     Dim cachePath
     Dim installPath
     cachePath = strDirCache &"\"& params(LV_Code)
@@ -91,28 +89,19 @@ Function deepExtract(params, web)
         If web Then
             deepExtract = objws.Run(""""& params(IP_InstallFile) &""" /quiet /layout """& cachePath &"""", 0, True)
             If deepExtract Then
-                WScript.Echo ":: [Error] :: deepExtract 1."
                 WScript.Echo ":: [Error] :: error extracting the web portion from the installer."
                 Exit Function
             End If
         ElseIf Not web Then
-            ' 打印完整的命令字符串
-            Dim darkCmd
-            darkCmd = """"& strDirWiX &"\dark.exe"" -x """& cachePath &""" """& params(IP_InstallFile) &""""
-            WScript.Echo ":: [Debug] :: 执行命令: " & darkCmd
-            
-            deepExtract = objws.Run(darkCmd, 0, True)
+            deepExtract = objws.Run(""""& strDirWiX &"\dark.exe"" -x """& cachePath &""" """& params(IP_InstallFile) &"""", 0, True)
             If deepExtract Then
-                WScript.Echo ":: [Error] :: deepExtract 2."
                 WScript.Echo ":: [Error] :: error extracting the embedded portion from the installer."
-                WScript.Echo ":: [Debug] :: 命令返回值: " & deepExtract
-                ' Exit Function
+                Exit Function
             End If
             deepExtract = objws.Run("cmd /D /C move """& cachePath &"""\AttachedContainer\*.msi """& cachePath &"""", 0, True)
             If deepExtract Then
-                WScript.Echo ":: [Error] :: deepExtract 3."
                 WScript.Echo ":: [Error] :: error extracting the embedded portion from the installer."
-                ' Exit Function
+                Exit Function
             End If
         End If
     End If
