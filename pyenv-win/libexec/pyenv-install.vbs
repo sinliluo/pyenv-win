@@ -93,11 +93,24 @@ Function deepExtract(params, web)
                 Exit Function
             End If
         ElseIf Not web Then
+            Dim darkCmd
+            Dim retryCount, maxRetries
+            maxRetries = 20
+            retryCount = 0
+            darkCmd = """"& strDirWiX &"\dark.exe"" -x """& cachePath &""" """& params(IP_InstallFile) &""""
+            WScript.Echo ":: [Debug] :: darkCmd:" & darkCmd
             deepExtract = objws.Run(""""& strDirWiX &"\dark.exe"" -x """& cachePath &""" """& params(IP_InstallFile) &"""", 0, True)
+            Do While deepExtract And retryCount < maxRetries
+                WScript.Echo ":: [Warning] :: Extraction failed, retrying... (" & (retryCount + 1) & "/" & maxRetries & ")"
+                WScript.Sleep 1000 ' Wait 1 second before retrying
+                deepExtract = objws.Run(""""& strDirWiX &"\dark.exe"" -x """& cachePath &""" """& params(IP_InstallFile) &"""", 0, True)
+                retryCount = retryCount + 1
+            Loop
             If deepExtract Then
                 WScript.Echo ":: [Error] :: error extracting the embedded portion from the installer."
                 Exit Function
             End If
+            WScript.Echo ":: [dark.exe] :: Extraction successful"
             deepExtract = objws.Run("cmd /D /C move """& cachePath &"""\AttachedContainer\*.msi """& cachePath &"""", 0, True)
             If deepExtract Then
                 WScript.Echo ":: [Error] :: error moving the extracted embedded portion from the installer."
